@@ -1,5 +1,4 @@
 from tkinter import *
-
 from Registro_Facial_Empleado import RFE
 from Tomar_asistencia import Asistencia
 from cat_empleado import CatEmpleadoModel
@@ -11,6 +10,7 @@ class Menu:
         self.root = panel
         self.root.title("Menu principal")
         self.root.geometry("800x400")
+        self.root.resizable(False, False)
 
         self.fondo = PhotoImage(file="Recursos/Fondos/fondo.png")
         self.background = Label(self.root, image=self.fondo, text="Inicio")

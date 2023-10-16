@@ -42,7 +42,8 @@ class Asistencia:
         self.root = panel
 
         # Configurar la geometría de la ventana
-        self.root.geometry("1280x700")
+        self.root.state('zoomed')
+        self.root.resizable(False, False)
         self.root.title("Registro de Empleados")
         self.root.iconbitmap("SetUp/icono.ico")
 
@@ -64,10 +65,15 @@ class Asistencia:
             self.tree.column(col, anchor="center")
         self.tree.pack(expand=True, fill=BOTH)
 
-        self.confirma = Button(self.frame_options, text="Confirmar asistencia", command=self.registrar_asistencia)
-        self.confirma.pack(padx=20, pady=20)
-        self.confirma = Button(self.frame_options, text="Volver a escanear", command=self.sign)
-        self.confirma.pack(padx=20, pady=20)
+        self.iniciar = Button(self.frame_options, text="Iniciar Captura", font=("Helvetica", 10),
+                              command=self.sign)
+        self.iniciar.pack(side=LEFT, padx=100, pady=10)
+        self.detener = Button(self.frame_options, text="Detener Captura", font=("Helvetica", 10),
+                              state="disabled", command=self.detener_captura)
+        self.detener.pack(side=LEFT, padx=100, pady=10)
+        self.confirma = Button(self.frame_options, text="Confirmar asistencia", font=("Helvetica", 10),
+                               command=self.registrar_asistencia, state="disabled")
+        self.confirma.pack(side=LEFT, padx=100, pady=10)
 
         # Tool Draw
         self.mpDraw = mp.solutions.drawing_utils
@@ -80,7 +86,6 @@ class Asistencia:
         # Object Detect
         self.FaceObject = mp.solutions.face_detection
         self.detector = self.FaceObject.FaceDetection(min_detection_confidence=0.5, model_selection=1)
-        self.sign()
 
     def code_face(self):
         listacod = []
@@ -97,6 +102,7 @@ class Asistencia:
         return listacod
 
     def sign(self):
+        self.iniciar.config(state="disabled")
         lista = os.listdir(self.OutFolderPathFace)
 
         for lis in lista:
@@ -111,13 +117,13 @@ class Asistencia:
         self.FaceCode = self.code_face()
 
         self.lblVideo = Label(self.frame_video)
-        self.lblVideo.place(rely=0.5, relx=0.5, anchor="center")
+        self.lblVideo.place(y=20, rely=0.5, relx=0.5, anchor="center")
 
         # Elegimos la camara
         self.cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
         self.cap.set(3, 1280)
         self.cap.set(4, 720)
-
+        self.detener.config(state="active")
         hilo = threading.Thread(target=self.sign_biometric())
         hilo.start()
 
@@ -219,13 +225,11 @@ class Asistencia:
                                             offsetan = (self.offsetx / 100) * an
                                             xi = int(xi - int(offsetan / 2))
                                             an = int(an + offsetan)
-                                            xf = xi + an
 
                                             # Height
                                             offsetal = (self.offsety / 100) * al
                                             yi = int(yi - offsetal)
                                             al = int(al + offsetal)
-                                            yf = yi + al
 
                                             # Error < 0
                                             if xi < 0: xi = 0
@@ -237,19 +241,18 @@ class Asistencia:
                                             if self.step == 0:
                                                 # Draw
                                                 cv2.rectangle(frame, (xi, yi, an, al), (255, 0, 255), 2)
-                                                cv2.rectangle(frame, (xi - 100, yi - 50, xf - 300, yf), (255, 0, 255),
-                                                              2)
+
                                                 # IMG Step0
                                                 alis0, anis0, c = self.img_step0.shape
-                                                frame[50:50 + alis0, 50:50 + anis0] = self.img_step0
+                                                frame[30:30 + alis0, 50:50 + anis0] = self.img_step0
 
                                                 # IMG Step1
                                                 alis1, anis1, c = self.img_step1.shape
-                                                frame[50:50 + alis1, 1030:1030 + anis1] = self.img_step1
+                                                frame[30:30 + alis1, 1030:1030 + anis1] = self.img_step1
 
                                                 # IMG Step2
                                                 alis2, anis2, c = self.img_step2.shape
-                                                frame[270:270 + alis2, 1030:1030 + anis2] = self.img_step2
+                                                frame[250:250 + alis2, 1030:1030 + anis2] = self.img_step2
 
                                                 # Condiciones
                                                 if x7 > x5 and x8 < x6:
@@ -263,31 +266,25 @@ class Asistencia:
 
                                                     # IMG check
                                                     alich, anich, c = self.img_check.shape
-                                                    frame[165:165 + alich, 1105:1105 + anich] = self.img_check
+                                                    frame[145:145 + alich, 1105:1105 + anich] = self.img_check
                                                     # Parpadeos
                                                     # Conteo de parpadeos
-                                                    cv2.putText(frame, f'Parpadeos: {int(self.conteo)}', (1070, 375),
+                                                    cv2.putText(frame, f'Parpadeos: {int(self.conteo)}', (1070, 355),
                                                                 cv2.FONT_HERSHEY_COMPLEX, 0.5,
                                                                 (255, 255, 255), 1)
 
                                                     if self.conteo >= 3:
                                                         # IMG check
                                                         alich, anich, c = self.img_check.shape
-                                                        frame[385:385 + alich, 1105:1105 + anich] = self.img_check
+                                                        frame[365:365 + alich, 1105:1105 + anich] = self.img_check
 
                                                         # Open Eyes
-                                                        if longitud1 > 12 and longitud2 > 12:
-                                                            self.step = 1
+                                                        # if longitud1 > 12 and longitud2 > 12:
+                                                        self.step = 1
                                                 else:
                                                     self.conteo = 0
 
                                             if self.step == 1:
-                                                # Draw
-                                                cv2.rectangle(frame, (xi, yi, an, al), (0, 255, 0), 2)
-                                                # IMG check Liveness
-                                                allich, anlich, c = self.img_liche.shape
-                                                frame[50:50 + allich, 100:100 + anlich] = self.img_liche
-
                                                 # Find Faces
                                                 faces = fr.face_locations(rgb)
                                                 facescod = fr.face_encodings(rgb, faces)
@@ -308,16 +305,24 @@ class Asistencia:
 
                                                             # User
                                                             if Match[min]:
+                                                                # Draw
+                                                                cv2.rectangle(frame, (xi, yi, an, al), (0, 255, 0), 2)
+                                                                # IMG check Liveness
+                                                                allich, anlich, c = self.img_liche.shape
+                                                                frame[30:30 + allich, 50:50 + anlich] = self.img_liche
                                                                 # UserName
                                                                 self.UserName = self.clases[min].upper()
-
+                                                                cv2.putText(frame, f'{self.UserName}',
+                                                                            (xi, yi + al + 15),
+                                                                            cv2.FONT_HERSHEY_COMPLEX, 0.5,
+                                                                            (0, 255, 0), 1)
                                                                 cem = CatEmpleadoModel()
                                                                 self.set_tree_data(cem.search_emp(self.UserName))
-                                                                self.cap.release()
                                                                 self.conteo = 0
                                                                 self.parpadeo = False
                                                                 self.step = 0
                                                             else:
+                                                                cv2.rectangle(frame, (xi, yi, an, al), (250, 21, 12), 2)
                                                                 messagebox.showinfo(
                                                                     message="No se encontro similitud", title="Título")
                                                                 self.conteo = 0
@@ -327,18 +332,18 @@ class Asistencia:
                                                                 if self.rechazo == 3:
                                                                     messagebox.showinfo(
                                                                         message="Rechazado", title="Título")
-                                                                    self.cap.release()
+                                                                    self.detener_captura()
                                                                     return
                                                         else:
                                                             messagebox.showinfo(
                                                                 message="Lista vacia", title="Título")
-                                                            self.cap.release()
+                                                            self.detener_captura()
                                                             return
                                                     else:
                                                         messagebox.showinfo(
                                                             message="No hay rostros en la base de datos",
                                                             title="Título")
-                                                        self.cap.release()
+                                                        self.detener_captura()
                                                         return
 
                 # Redimensionamos el video
@@ -354,23 +359,45 @@ class Asistencia:
                 self.lblVideo.after(10, self.sign_biometric)
 
             else:
-                self.cap.release()
+                self.detener_captura()
+
+    def detener_captura(self):
+        self.cap.release()
+        self.conteo = 0
+        self.parpadeo = False
+        self.step = 0
+        self.iniciar.config(state="active")
+        self.confirma.config(state="disabled")
+        self.detener.config(state="disabled")
 
     def set_tree_data(self, data):
         self.tree.delete(*self.tree.get_children())
         if data:
+            self.confirma.config(state="active")
             for row in data:
                 self.tree.insert("", "end", values=row)
         else:
+            self.confirma.config(state="disabled")
             messagebox.showwarning(message="No se encontraron datos", title="Consulta")
 
     def registrar_asistencia(self):
         ast = AsistenciaDB()
-        asiste = ast.validar_registro(self.UserName)
-
-        if asiste:
-            ast.registrar_asistencia_salida(self.UserName)
+        if ast.validar_existencia_registro(self.UserName):
+            messagebox.showwarning(message="Registro del dia llenado anteriormente", title="Lista de asistencia")
         else:
-            ast.registrar_asistencia_entrada(self.UserName)
+            if ast.validar_registro_entrada_salida(self.UserName):
+                if ast.registrar_asistencia_salida(self.UserName):
+                    messagebox.showinfo(message="Salida capturada correctamente", title="Salida")
+                else:
+                    messagebox.showerror(message="Hubo un error al capturar la salida", title="Salida")
+            else:
+                if ast.registrar_asistencia_entrada(self.UserName):
+                    messagebox.showinfo(message="Entrada capturada correctamente", title="Entrada")
+                else:
+                    messagebox.showerror(message="Hubo un error al capturar la entrada", title="Entrada")
 
 
+if __name__ == "__main__":
+    root = Tk()
+    app = Asistencia(root)
+    root.mainloop()

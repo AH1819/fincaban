@@ -35,11 +35,12 @@ class CatEmpleadoModel:
                          "FROM cat_empleado ce "
                          "INNER JOIN finca_install fa ON fa.nofinca = ce.nofinca "
                          "INNER JOIN datos_biometricos dbs ON dbs.noemp = ce.noemp "
+                         "LEFT JOIN lista_asist la "
+                         "ON la.noemp = ce.noemp "
                          "WHERE ce.noemp = %s AND dbs.rostro IS NOT NULL AND ce.status = 'Activo'")
             with self.db.connection.cursor() as cursor:
                 cursor.execute(consultar, (noemp,))
                 rows = cursor.fetchall()
+                return rows
         except Exception as e:
-            print(f"Error al insertar datos: {str(e)}")
-
-        return rows
+            print(f"Error al consultar datos: {str(e)}")

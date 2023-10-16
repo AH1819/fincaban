@@ -1,4 +1,6 @@
 from tkinter import *
+from cat_empleado import CatEmpleadoModel
+from Registro_Facial_Empleado import RFE
 from RegistrarRostro import RegistroFace
 
 
@@ -48,3 +50,12 @@ class CatEmpleadoController:
         RegistroFace(panel, self.list_seleccionado)
         panel.mainloop()
 
+
+if __name__ == "__main__":
+    root = Tk()
+
+    model = CatEmpleadoModel()
+    view = RFE(root)
+    controller = CatEmpleadoController(model, view)
+
+    root.mainloop()

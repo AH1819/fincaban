@@ -46,8 +46,9 @@ class RegistroFace:
         self.FaceObject = mp.solutions.face_detection
         self.detector = self.FaceObject.FaceDetection(min_detection_confidence=0.5, model_selection=1)
 
+        self.root.state('zoomed')
+        self.root.resizable(False, False)
         self.root.title("Registro de Empleados")
-        self.root.geometry("1280x620")
         self.root.iconbitmap("SetUp/icono.ico")
 
         self.frame_video = Frame(self.root, bg="black")
@@ -259,3 +260,9 @@ class RegistroFace:
             else:
                 self.cap.release()
 
+
+if __name__ == "__main__":
+    empleado = [2, "Adolfo", "Santa lucia", "A"]
+    root = Tk()
+    app = RegistroFace(root, empleado)
+    root.mainloop()

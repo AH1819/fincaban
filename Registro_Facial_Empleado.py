@@ -6,8 +6,9 @@ from tkinter.ttk import Treeview, Style
 class RFE:
     def __init__(self, panel):
         self.root = panel
+        self.root.state('zoomed')
+        self.root.resizable(False, False)
         self.root.title("Registro de Empleados")
-        self.root.geometry("800x500")
         self.root.iconbitmap("SetUp/icono.ico")
 
         self.frame = Frame(self.root, width=200, height=200, bg="lightblue")
@@ -53,3 +54,8 @@ class RFE:
             self.entry_nombre.config(state="disabled")
             messagebox.showwarning(message="No se encontraron datos", title="Consulta")
 
+
+if __name__ == "__main__":
+    root = Tk()
+    app = RFE(root)
+    root.mainloop()

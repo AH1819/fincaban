@@ -6,7 +6,26 @@ class AsistenciaDB:
     def __init__(self):
         self.db = DatabaseConnection()
 
-    def validar_registro(self, noemp):
+    def validar_existencia_registro(self, noemp):
+        try:
+            fecha_actual = datetime.now().date()
+            consult_query = """
+            SELECT * FROM lista_asist WHERE noemp = %s AND fecha = %s
+            """
+            with self.db.connection.cursor() as cursor:
+                cursor.execute(consult_query, (noemp, fecha_actual))
+                self.db.connection.commit()
+                rows = cursor.fetchall()
+                if rows:
+                    return True
+                else:
+                    return False
+
+        except Exception as e:
+            print(f"Error al consultar datos: {str(e)}")
+            return False
+
+    def validar_registro_entrada_salida(self, noemp):
         try:
             consult_query = """
             SELECT * FROM lista_asist WHERE noemp = %s AND hora_sale is null
@@ -54,5 +73,4 @@ class AsistenciaDB:
         except Exception as e:
             print(f"Error al insertar datos: {str(e)}")
             return False
-
 
