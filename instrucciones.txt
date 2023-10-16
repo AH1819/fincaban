@@ -1,1 +1,9 @@
 el main es Menu.py
+
+instalar :
+pip install opencv-python  
+pip install Pillow  
+pip install imutils   
+pip install mediapipe  
+pip install face_recognition
+pip install psycopg2
