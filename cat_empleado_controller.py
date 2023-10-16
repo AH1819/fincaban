@@ -1,6 +1,4 @@
 from tkinter import *
-from cat_empleado import CatEmpleadoModel
-from Registro_Facial_Empleado import RFE
 from RegistrarRostro import RegistroFace
 
 
