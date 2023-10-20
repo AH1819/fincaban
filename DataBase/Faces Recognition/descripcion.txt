@@ -1,1 +1,0 @@
-aqui se guardan las imagenes registradas de los rostros, nombradas con su id unico

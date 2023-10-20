@@ -1,3 +1,5 @@
+select split_part(noemp,'-',1) as nofinca from cat_empleado;
+
 create database fincaban;
 	--SuperUsuario: postgres
 	--Contraseña: AH18192001
